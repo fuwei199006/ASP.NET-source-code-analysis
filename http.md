@@ -45,11 +45,11 @@ user-agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like G
  
  - **method:**  method代表请求的方式（常用的有Get,Post,Put,Delete）    
  
- - **accept-encoding:** 是浏览器发给服务器,声明浏览器支持的编码类型    
+ - **accept-encoding:**  是浏览器发给服务器,声明浏览器支持的编码类型    
  
- - **referer:**告诉服务器我是从哪个页面链接过来的     
+ - **referer:** 告诉服务器我是从哪个页面链接过来的     
  
- - **user-agent:**当前设备的一些信息
+ - **user-agent:** 当前设备的一些信息
  
 
 **HTTP三点注意事项：**
