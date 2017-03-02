@@ -75,7 +75,18 @@
  Timing-Allow-Origin: *
  EagleId: 3d9a7e0914884432578382004e
  
- ```    
+ ```       
+ 
+ - **HTTP/1.1 200 OK:** 这上代表响应http版本和响应状态    
+ 
+ - **Server:** 代表响应的服务器的类型，此处为Tengine   
+ 
+ - **Content-Length:** 代表响应的字节数    
+ 
+ - **Content-Encoding:**内容的编码方式，此处为gzip
+
+ 
+
    
 
 **HTTP三点注意事项：**
