@@ -166,16 +166,32 @@
 
  当请求过来的时候，基于上面的代码，可以给浏览器发送一个信息，在while块里面添加代码：   
  
- ``` C#   
-   if (!string.IsNullOrEmpty(httpHeader))
-    {
-        var httpResponse = "<h1>Hello Http</h1>";
-        var sentBytes = Encoding.Default.GetBytes(httpResponse);
-        socketProx.Send(sentBytes, 0, sentBytes.Length, SocketFlags.None);
-        socketProx.Shutdown(SocketShutdown.Both);
-    }
+ ``` C# 
+   
+   while (true)
+   {
+       var socketProx = socket.Accept(); //接收数据
+       var bytes = new byte[1024 * 1024];
+       var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);
+       var httpHeader = Encoding.Default.GetString(bytes, 0, len);
+       SetText(httpHeader);
 
-```    
+       if (!string.IsNullOrEmpty(httpHeader))
+       {
+           var httpResponse = "<h1>Hello Http</h1>";
+           var sentBytes = Encoding.Default.GetBytes(httpResponse);
+           socketProx.Send(sentBytes, 0, sentBytes.Length, SocketFlags.None);
+           socketProx.Shutdown(SocketShutdown.Both);
+       }
+
+   }
+
+```      
+请求结果为：    
+![helloHttp](/assets/helloHttp结果.png)   
+
+
+
 
 
  
