@@ -52,7 +52,7 @@ Cookie: __gads=ID=e2f30d616c5344bf:T=1484287454:S=ALNI_MY6vTrW8EvdzER-v1nE-YnGJj
  
  - **User-Agent:** 当前设备的一些信息    
  
- - **Cookie**
+ - **Cookie:** 客户端存储的信息，一般是登录信息或者其它认证信息
  
 
 **HTTP三点注意事项：**
