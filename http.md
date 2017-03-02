@@ -55,7 +55,8 @@
    
 #####　响应头信息　　　　
 
- ``` json    
+ ``` json   
+   
  HTTP/1.1 200 OK
  Server: Tengine
  Content-Type: application/javascript
