@@ -129,8 +129,8 @@
           {
               var socketProx = socket.Accept(); //接收数据
               var bytes = new byte[1024 * 1024];
-              var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);
-              var httpHeader = Encoding.Default.GetString(bytes, 0, len);
+              var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);//获得长度
+              var httpHeader = Encoding.Default.GetString(bytes, 0, len);//把二进制的数据转成文本
               SetText(httpHeader);//内容的显示
               if (!string.IsNullOrEmpty(httpHeader))
               {
@@ -149,7 +149,10 @@
       });
            
 ```   
-运行的结果如下：   
+运行程序，会自动打开默认的浏览器，获得当前的ip和随机生成的接口，运行的结果如下：  
+
+      
+![](/assets/浏览器访问.png)
 
 ![监控运行界面](/assets/监控运行界面.png)
 
@@ -167,14 +170,12 @@
     Accept-Language: zh-CN,zh;q=0.8,en;q=0.6 
 
 ```  
-
-
-    
+捕获的http的信息，与上面谈到的信息格式是相同的。
 
  
+##### 响应请求的内容      
 
- 
-##### 响应请求的内容   
+ 当请求过来的时候，会有一个URI的信息(请求的文件或者其它信息)，此处以文件为例
 
  
  
