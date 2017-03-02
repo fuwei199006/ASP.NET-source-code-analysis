@@ -132,18 +132,6 @@
               var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);//获得长度
               var httpHeader = Encoding.Default.GetString(bytes, 0, len);//把二进制的数据转成文本
               SetText(httpHeader);//内容的显示
-              if (!string.IsNullOrEmpty(httpHeader))
-              {
-                  var context = new HttpContext(httpHeader);
-                  var application = new HttpApplication();
-                  application.ProcessRequest(context);
-
-                  byte[] responseBytes = context.HttpRespone.Body;
-                  socketProx.Send(context.HttpRespone.Header);
-                  socketProx.Send(responseBytes);
-                  socketProx.Shutdown(SocketShutdown.Both);
-              }
-
           }
 
       });
@@ -176,7 +164,19 @@
  
 ##### 响应请求的内容      
 
- 当请求过来的时候，会有一个URI的信息(请求的文件或者其它信息)，此处以文件为例
+ 当请求过来的时候，基于上面的代码，可以给浏览器发送一个信息，在while块里面添加代码：   
+ 
+ ``` C#   
+   if (!string.IsNullOrEmpty(httpHeader))
+    {
+        var httpResponse = "<h1>Hello Http</h1>";
+        var sentBytes = Encoding.Default.GetBytes(httpResponse);
+        socketProx.Send(sentBytes, 0, sentBytes.Length, SocketFlags.None);
+        socketProx.Shutdown(SocketShutdown.Both);
+    }
+
+```    
+
 
  
  
