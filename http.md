@@ -111,6 +111,52 @@
  
  
 当点击开启的时候，运行如下代码：    
+
+``` C#    
+     if (!open)
+            {
+                open = true;
+                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                var endPoint = new IPEndPoint(IPAddress.Parse(this.txtIP.Text), int.Parse(txtPort.Text));
+                socket.Bind(endPoint);
+                socket.Listen(10);
+                if (isAutoOpen.Checked)
+                {
+                    System.Diagnostics.Process.Start("http://" + this.txtIP.Text + ":" + this.txtPort.Text);
+                }
+                ThreadPool.QueueUserWorkItem(r =>
+                {
+                    while (true)
+                    {
+                        var socketProx = socket.Accept(); //接收数据
+                        var bytes = new byte[1024 * 1024];
+                        var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);
+                        var httpHeader = Encoding.Default.GetString(bytes, 0, len);
+                        SetText(httpHeader);
+
+                        if (!string.IsNullOrEmpty(httpHeader))
+                        {
+                            var context = new HttpContext(httpHeader);
+                            var application = new HttpApplication();
+                            application.ProcessRequest(context);
+
+                            byte[] responseBytes = context.HttpRespone.Body;
+                            socketProx.Send(context.HttpRespone.Header);
+                            socketProx.Send(responseBytes);
+                            socketProx.Shutdown(SocketShutdown.Both);
+                        }
+
+                    }
+
+                });
+            }
+            else
+            {
+                MessageBox.Show("不能重复开启");
+            }
+ 
+
+```  
  
 
  
