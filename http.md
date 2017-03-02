@@ -113,50 +113,64 @@
 当点击开启的时候，运行如下代码：    
 
 ``` C#    
-     if (!open)
-            {
-                open = true;
-                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                var endPoint = new IPEndPoint(IPAddress.Parse(this.txtIP.Text), int.Parse(txtPort.Text));
-                socket.Bind(endPoint);
-                socket.Listen(10);
-                if (isAutoOpen.Checked)
-                {
-                    System.Diagnostics.Process.Start("http://" + this.txtIP.Text + ":" + this.txtPort.Text);
-                }
-                ThreadPool.QueueUserWorkItem(r =>
-                {
-                    while (true)
-                    {
-                        var socketProx = socket.Accept(); //接收数据
-                        var bytes = new byte[1024 * 1024];
-                        var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);
-                        var httpHeader = Encoding.Default.GetString(bytes, 0, len);
-                        SetText(httpHeader);
+  
+      var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+      var endPoint = new IPEndPoint(IPAddress.Parse(this.txtIP.Text), int.Parse(txtPort.Text));
+      socket.Bind(endPoint);
+      socket.Listen(10);
+      if (isAutoOpen.Checked)
+      {
+         //使用默认的浏览器打开
+          System.Diagnostics.Process.Start("http://" + this.txtIP.Text + ":" + this.txtPort.Text);
+      }
+      ThreadPool.QueueUserWorkItem(r =>
+      {
+          while (true)
+          {
+              var socketProx = socket.Accept(); //接收数据
+              var bytes = new byte[1024 * 1024];
+              var len = socketProx.Receive(bytes, 0, bytes.Length, SocketFlags.None);
+              var httpHeader = Encoding.Default.GetString(bytes, 0, len);
+              SetText(httpHeader);//内容的显示
+              if (!string.IsNullOrEmpty(httpHeader))
+              {
+                  var context = new HttpContext(httpHeader);
+                  var application = new HttpApplication();
+                  application.ProcessRequest(context);
 
-                        if (!string.IsNullOrEmpty(httpHeader))
-                        {
-                            var context = new HttpContext(httpHeader);
-                            var application = new HttpApplication();
-                            application.ProcessRequest(context);
+                  byte[] responseBytes = context.HttpRespone.Body;
+                  socketProx.Send(context.HttpRespone.Header);
+                  socketProx.Send(responseBytes);
+                  socketProx.Shutdown(SocketShutdown.Both);
+              }
 
-                            byte[] responseBytes = context.HttpRespone.Body;
-                            socketProx.Send(context.HttpRespone.Header);
-                            socketProx.Send(responseBytes);
-                            socketProx.Shutdown(SocketShutdown.Both);
-                        }
+          }
 
-                    }
+      });
+           
+```   
+运行的结果如下：   
 
-                });
-            }
-            else
-            {
-                MessageBox.Show("不能重复开启");
-            }
- 
+![监控运行界面](/assets/监控运行界面.png)
+
+监控获得内容如下： 
+
+``` json  
+
+    GET / HTTP/1.1
+    Host: 10.28.11.43:55882
+    Connection: keep-alive
+    Upgrade-Insecure-Requests: 1
+    User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36
+    Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+    Accept-Encoding: gzip, deflate, sdch
+    Accept-Language: zh-CN,zh;q=0.8,en;q=0.6 
 
 ```  
+
+
+    
+
  
 
  
