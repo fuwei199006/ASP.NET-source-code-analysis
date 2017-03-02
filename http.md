@@ -22,6 +22,7 @@
  ![请求jquery](/assets/jquery请求.png)       
  
  （上面的图是请求jqury的请求和响应信息）
+ 
  详细看下请求的头信息      
  
  
