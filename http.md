@@ -79,7 +79,9 @@
  
  - **HTTP/1.1 200 OK:** 这上代表响应http版本和响应状态    
  
- - **Server:** 代表响应的服务器的类型，此处为Tengine   
+ - **Server:** 代表响应的服务器的类型，此处为Tengine    
+ 
+ - **Content-Type:**响应的类型，此处是 application/javascript，即是js文件
  
  - **Content-Length:** 代表响应的字节数    
  
@@ -187,8 +189,43 @@
    }
 
 ```      
-请求结果为：    
-![helloHttp](/assets/helloHttp结果.png)   
+用Chrome请求结果为：    
+![helloHttp](/assets/helloHttp结果.png)     
+
+用火狐请求的结果为：     
+
+![FireFox浏览器访问](/assets/FireFox浏览器访问.png)       
+
+在面对上面的两个浏览器的请求结果时候，可以看到，此时程序已经和浏览器进行了通信。造成上面的两个结果的不同，是没有指定响应的内容，浏览器按照默认的格式进行渲染，所以Chrome认为是html，而FireFox认为是text。  
+
+避免上面的结果，可以响应的时候把返回的内容进行约束，即：Content-Type属性。把响应的内容修改如下：      
+
+``` C#    
+    var httpResponse = "<h1>Hello Http</h1>";
+    var sentBytes = Encoding.Default.GetBytes(httpResponse);
+    
+    var sb = new StringBuilder();
+    sb.AppendLine("HTTP/1.1 200 OK");
+    sb.AppendLine("Date:" + DateTime.Now);
+    sb.AppendLine("Content-Type:text/html");
+    sb.AppendLine("Content-Length:" + sentBytes.Length);
+    sb.AppendLine();
+    var sentHeader = Encoding.Default.GetBytes(sb.ToString());
+    socketProx.Send(sentHeader, 0, sentHeader.Length, SocketFlags.None);//发送内容前，先发送响应的头文件 
+    
+    socketProx.Send(sentBytes, 0, sentBytes.Length, SocketFlags.None);
+    socketProx.Shutdown(SocketShutdown.Both); 
+```   
+
+修改后，fireFox响应结果如下：     
+
+![](/assets/FireFox浏览器访问1.png)
+
+
+
+
+
+
 
 
 
