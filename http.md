@@ -212,7 +212,7 @@
 
 利用上面所述的demo，可以简单的扩展成一个简单的文件服务器。当程序启动的时候，读取当前的目录所有的文件信息转成html信息,发送给浏览器。运行结果如下 ：
 
-![](/assets/fileServer.png)
+![fileServer](/assets/fileServer.png)
 
 这样可以简单做一个服务器，使用ajax和文件分享都是可以的。
 
