@@ -17,7 +17,7 @@
 
 > HTTP协议是Hyper Text Transfer Protocol（超文本传输协议）的缩写,是用于从万维网（WWW:World Wide Web ）服务器传输超文本到本地浏览器的传送协议。
 
-用简单的话来说，当客户端与服务器端通信的时候，需要传输的内容有（HTML 文件，js+css, 图片，文本, 查询结果等）,http协议把内容传输规范化。可以随便查看下一个http协议的内容：
+用简单的话来说，当客户端与服务器端通信的时候，需要传输的内容有（HTML 文件,js+css, 图片,文本, 查询结果等）,http协议把内容传输规范化。可以随便查看下一个http协议的内容：
 
  ![请求jquery](/assets/jquery请求.png)       
  
