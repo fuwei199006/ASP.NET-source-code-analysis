@@ -23,37 +23,59 @@
  
  （上面的图是请求jqury的请求和响应信息）
  
- 详细看下请求的头信息      
+##### 请求的头信息      
  
- ``` json
+   ``` json
+   
+  GET /script/jquery.js HTTP/1.1
+  Host: common.cnblogs.com
+  Connection: keep-alive
+  Pragma: no-cache
+  Cache-Control: no-cache
+  User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36
+  Accept: */*
+  Referer: http://kb.cnblogs.com/page/130970/
+  Accept-Encoding: gzip, deflate, sdch
+  Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+  Cookie: __gads=ID=e2f30d616c5344bf:T=1484287454:S=ALNI_MY6vTrW8EvdzER-v1nE-YnGJjxTzA; pgv_pvi=1271870464; __utma=226521935.1402060598.1484617348.1487768840.1487819679.5; __utmz=226521935.1487819679.5.3.utmcsr=bing|utmccn=(organic)|utmcmd=organic|utmctr=c%23%20Semaphore; _ga=GA1.2.1402060598.1484617348
+  
+   ```    
  
-GET /script/jquery.js HTTP/1.1
-Host: common.cnblogs.com
-Connection: keep-alive
-Pragma: no-cache
-Cache-Control: no-cache
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36
-Accept: */*
-Referer: http://kb.cnblogs.com/page/130970/
-Accept-Encoding: gzip, deflate, sdch
-Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
-Cookie: __gads=ID=e2f30d616c5344bf:T=1484287454:S=ALNI_MY6vTrW8EvdzER-v1nE-YnGJjxTzA; pgv_pvi=1271870464; __utma=226521935.1402060598.1484617348.1487768840.1487819679.5; __utmz=226521935.1487819679.5.3.utmcsr=bing|utmccn=(organic)|utmcmd=organic|utmctr=c%23%20Semaphore; _ga=GA1.2.1402060598.1484617348
+   上面有几个重点的信息:    
+   
+   - **GET /script/jquery.js HTTP/1.1** 这个代表请求的方法是GET(常用的有GET,POST,PUT,DELETE),请求的URI为 /script/jquery.js, HTTP的版本信息为1.1
+     
+   - **Accept-Encoding:**  是浏览器发给服务器,声明浏览器支持的编码类型    
+  
+   - **Referer:** 告诉服务器我是从哪个页面链接过来的     
+  
+   - **User-Agent:** 当前设备的一些信息    
+  
+   - **Cookie:** 客户端存储的信息，一般是登录信息或者其它认证信息 
+   
+#####　响应头信息　　　　
 
+ ``` json    
+ HTTP/1.1 200 OK
+ Server: Tengine
+ Content-Type: application/javascript
+ Content-Length: 33411
+ Connection: keep-alive
+ Date: Wed, 20 Jul 2016 02:26:20 GMT
+ Vary: Accept-Encoding
+ Cache-Control: public,max-age=25920000
+ Last-Modified: Fri, 15 Feb 2013 03:06:57 GMT
+ Content-Encoding: gzip
+ Via: cache14.l2cm12[0,200-0,H], cache10.l2cm12[1,0], kunlun5.cn199[0,200-0,H], kunlun9.cn199[0,0]
+ Age: 19461677
+ X-Cache: HIT TCP_MEM_HIT dirn:9:763113955
+ X-Swift-SaveTime: Fri, 26 Aug 2016 05:18:04 GMT
+ X-Swift-CacheTime: 22712896
+ Timing-Allow-Origin: *
+ EagleId: 3d9a7e0914884432578382004e
+ 
  ```    
- 
- 上面有几个重点的信息:    
- 
- - **GET /script/jquery.js HTTP/1.1** 这个代表请求的方法是GET(常用的有GET,POST,PUT,DELETE),请求的URI为 /script/jquery.js, HTTP的版本信息为1.1
-    
- 
- - **Accept-Encoding:**  是浏览器发给服务器,声明浏览器支持的编码类型    
- 
- - **Referer:** 告诉服务器我是从哪个页面链接过来的     
- 
- - **User-Agent:** 当前设备的一些信息    
- 
- - **Cookie:** 客户端存储的信息，一般是登录信息或者其它认证信息
- 
+   
 
 **HTTP三点注意事项：**
 
@@ -61,7 +83,9 @@ Cookie: __gads=ID=e2f30d616c5344bf:T=1484287454:S=ALNI_MY6vTrW8EvdzER-v1nE-YnGJj
 
 * HTTP是媒体独立的：这意味着，只要客户端和服务器知道如何处理的数据内容，任何类型的数据都可以通过HTTP发送。客户端以及服务器指定使用适合的MIME-type内容类型。
 
-* HTTP是无状态：HTTP协议是无状态协议。无状态是指协议对于事务处理没有记忆能力。缺少状态意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大。另一方面，在服务器不需要先前信息时它的应答就较快。
+* HTTP是无状态：HTTP协议是无状态协议。无状态是指协议对于事务处理没有记忆能力。缺少状态意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大。另一方面，在服务器不需要先前信息时它的应答就较快。   
+
+
 
 
 
