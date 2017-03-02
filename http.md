@@ -43,13 +43,16 @@ Cookie: __gads=ID=e2f30d616c5344bf:T=1484287454:S=ALNI_MY6vTrW8EvdzER-v1nE-YnGJj
  
  上面有几个重点的信息:    
  
- - **method:**  method代表请求的方式（常用的有Get,Post,Put,Delete）    
+ - **GET /script/jquery.js HTTP/1.1** 这个代表请求的方法是GET(常用的有GET,POST,PUT,DELETE),请求的URI为 /script/jquery.js,HTTP的版本信息为1.1
+    
  
- - **accept-encoding:**  是浏览器发给服务器,声明浏览器支持的编码类型    
+ - **Accept-Encoding:**  是浏览器发给服务器,声明浏览器支持的编码类型    
  
- - **referer:** 告诉服务器我是从哪个页面链接过来的     
+ - **Referer:** 告诉服务器我是从哪个页面链接过来的     
  
- - **user-agent:** 当前设备的一些信息
+ - **User-Agent:** 当前设备的一些信息    
+ 
+ - **Cookie**
  
 
 **HTTP三点注意事项：**
