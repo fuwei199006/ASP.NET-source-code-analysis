@@ -25,7 +25,28 @@
  
  详细看下请求的头信息      
  
+ ``` json
  
+:authority:cdn.bootcss.com
+:method:GET
+:path:/jquery/2.0.3/jquery.min.js
+:scheme:https
+accept:*/*
+accept-encoding:gzip, deflate, sdch, br
+accept-language:zh-CN,zh;q=0.8,en;q=0.6
+cache-control:no-cache
+pragma:no-cache
+referer:http://www.runoob.com/http/http-intro.html
+user-agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36    
+
+ ```    
+ 
+ 上面有几个重点的信息:    
+ 
+ - **method:**  method代表请求的方式（常用的有Get,Post,Put,Delete）  
+ - **accept-encoding:**     
+ - **referer:**      
+ - **user-agent:**
  
 
 **HTTP三点注意事项：**
