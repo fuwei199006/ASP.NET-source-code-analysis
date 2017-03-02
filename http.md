@@ -43,9 +43,12 @@ user-agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like G
  
  上面有几个重点的信息:    
  
- - **method:**  method代表请求的方式（常用的有Get,Post,Put,Delete）  
- - **accept-encoding:**     
+ - **method:**  method代表请求的方式（常用的有Get,Post,Put,Delete）    
+ 
+ - **accept-encoding:** 是浏览器发给服务器,声明浏览器支持的编码类型    
+ 
  - **referer:**      
+ 
  - **user-agent:**
  
 
