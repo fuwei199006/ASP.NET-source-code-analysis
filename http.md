@@ -27,17 +27,17 @@
  
  ``` json
  
-:authority:cdn.bootcss.com
-:method:GET
-:path:/jquery/2.0.3/jquery.min.js
-:scheme:https
-accept:*/*
-accept-encoding:gzip, deflate, sdch, br
-accept-language:zh-CN,zh;q=0.8,en;q=0.6
-cache-control:no-cache
-pragma:no-cache
-referer:http://www.runoob.com/http/http-intro.html
-user-agent:Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36    
+GET /script/jquery.js HTTP/1.1
+Host: common.cnblogs.com
+Connection: keep-alive
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36
+Accept: */*
+Referer: http://kb.cnblogs.com/page/130970/
+Accept-Encoding: gzip, deflate, sdch
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: __gads=ID=e2f30d616c5344bf:T=1484287454:S=ALNI_MY6vTrW8EvdzER-v1nE-YnGJjxTzA; pgv_pvi=1271870464; __utma=226521935.1402060598.1484617348.1487768840.1487819679.5; __utmz=226521935.1487819679.5.3.utmcsr=bing|utmccn=(organic)|utmcmd=organic|utmctr=c%23%20Semaphore; _ga=GA1.2.1402060598.1484617348
 
  ```    
  
