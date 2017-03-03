@@ -7,7 +7,7 @@
  ![Http.SYS机制](/assets/HttpSys机制.png)
 
 
-### Http.Sys    
+### HTTP.SYS     
 HTTP.SYS是TCP之上的一个网络驱动程序，因此，HTTP.SYS不再属于IIS(这里说的IIS都是IIS6.0+版本，下文如果不特殊指明，默认为IIS6.0+版本)，它已经从IIS中独立了出来。 Http.Sys独立有以下几个优点：     
 
 - 可靠性： HTTP.SYS运行在内核模式下，作为操作系统的驱动程序运行。因此，HTTP.SYS不会受到用户代码的影响，它始终处于稳定运行状态，对用户的http请求进行监听，并及时作出反应。   
@@ -16,4 +16,21 @@ HTTP.SYS是TCP之上的一个网络驱动程序，因此，HTTP.SYS不再属于I
  
 
 ### IIS处理    
+
+#### W3SVC
+
+1. W3SVC服务是一个独立运行的程序，寄宿在svchost.exe进程中，负责用户的参数监视和重新启动应用池的工作。 当一个请求进入HTTP.SYS的队列中，会通知W3SVC服务根据IIS中的配置去创建对应的应用进程，进行处理。       
+
+
+#### W3Core或W3WP.exe   
+
+1. 当HTTP.SYS把请求传递给IIS时候，W3SVC会启动对应的应用程序池（w3wp.exe).      
+   
+2. 当用户请求的是静态文件，如：HTML和图片等，IIS会直接读取文件内容，转成二进制文件流，返回给HTTP.SYS。    
+      
+3. 当请求非静态文件，如：.aspx。    
+  
+  a. w3wp.exe会根据IIS中ISAPI扩展读取对应的处理的Dll，用asp.net举例：当用户访问的网站是asp.net平台，则最终访问的是.cshtml和.aspx文件类型。根据配置w3wp.exe会加载aspnet_isapi.dll(简称是ISAPI).        
+  
+  b.  当ISAPI加载后，会启动一个ASP.NET的工作进程(ASPNET_WP.exe)，把信息的控制权交给ASPNET_WP.exe来处理。
 
