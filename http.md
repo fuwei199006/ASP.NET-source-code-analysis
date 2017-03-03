@@ -214,7 +214,7 @@
 
 ![fileServer](/assets/fileServer.png)
 
-这样可以简单做一个服务器，使用ajax和文件分享都是可以的。git地址：  
+这样可以简单做一个服务器，使用ajax和文件分享都是可以的。git地址：https://github.com/fuwei199006/DemoLib/tree/master/Http%E5%8D%8F%E8%AE%AE/Tools.Server  
 
 
 写于 2017.03.02 
