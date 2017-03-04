@@ -22,15 +22,44 @@ HTTP.SYS是TCP之上的一个网络驱动程序，因此，HTTP.SYS不再属于I
 1. W3SVC服务是一个独立运行的程序，寄宿在svchost.exe进程中，负责用户的参数监视和重新启动应用池的工作。 当一个请求进入HTTP.SYS的队列中，会通知W3SVC服务根据IIS中的配置去创建对应的应用进程，进行处理。       
 
 
-#### W3Core或W3WP.exe   
+####  W3WP.exe   
 
-1. 当HTTP.SYS把请求传递给IIS时候，W3SVC会启动对应的应用程序池（w3wp.exe).      
+1. 当HTTP.SYS把请求传递给IIS时候，W3SVC会启动对应的应用程序池 
    
 2. 当用户请求的是静态文件，如：HTML和图片等，IIS会直接读取文件内容，转成二进制文件流，返回给HTTP.SYS。    
       
 3. 当请求非静态文件，如：.aspx。    
   
-  a. w3wp.exe会根据IIS中ISAPI扩展读取对应的处理的Dll，用asp.net举例：当用户访问的网站是asp.net平台，则最终访问的是.cshtml和.aspx文件类型。根据配置w3wp.exe会加载aspnet_isapi.dll(简称是ISAPI).        
+  a. w3wp.exe会根据IIS中ISAPI扩展读取对应的处理的Dll，用asp.net举例：当用户访问的网站是asp.net平台，则 类型是.cshtml和.aspx文件类型。根据配置w3wp.exe会加载aspnet_isapi.dll(简称是ISAPI).     
+   
+   IIS中应用程序的映射：     
+   
+  ![](/assets/IIS处理请求映射.png)
   
-  b.  当ISAPI加载后，会启动一个ASP.NET的工作进程(ASPNET_WP.exe)，把信息的控制权交给ASPNET_WP.exe来处理。
+  IIS中处理流程：
+  
+  ![](/assets/IIS处理流程.png)
+  
+  b.  当ISAPI加载后，会启动一个ASP.NET的工作进程，把信息的控制权交给Asp.Net来处理。此处请求的处理由IIS交给了asp.net的程序。  
+  
+  基于对上面的说明，可以把IIS的处理过程理解表示如下图：       
+  
+  ![](/assets/w3wp处理.png)      
+  
+  
+  说到这里，把IIS请求的流程简单的做了说明，后面的工作就由Asp.Net去完成了。
+  
+### .Net程序的运行     
+
+说到Asp.Net的运行，不得不先说下.Net的运行机制（算是为后面的文章做一个铺垫）。
+
+在vs中写了一段C#代码(或者其它.net平台的语言，此处简单的用C#来说明) ，编译器会把代码转译成IL的中间语言程序。当程序运行时，系统调用jit编译器，把中间语言编译成对应的cpu指令，等待cpu的最终调用。
+
+  
+  
+
+
+
+
+  
 
