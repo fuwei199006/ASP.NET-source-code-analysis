@@ -212,88 +212,88 @@
  
  这个方法里有三个方法的调用，分别是：
  
- ####  _theApplicationFactory.EnsureInited()    
+ ####  i. _theApplicationFactory.EnsureInited()    
  
  >  主要功能是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
      
-     
+             
  - 找到global.asax路径进行编译
-    ``` C#   
-      private void Init() {
-            if (_customApplication != null)
-                return;
-            try {
-                try {
-                    _appFilename = GetApplicationFile();
-                    CompileApplication();
+            ``` C#   
+              private void Init() {
+                    if (_customApplication != null)
+                        return;
+                    try {
+                        try {
+                            _appFilename = GetApplicationFile();
+                            CompileApplication();
+                        }
+                        finally {
+                            SetupChangesMonitor();
+                        }
+                    }
+                    catch { 
+                        throw;
+                    }
                 }
-                finally {
-                    SetupChangesMonitor();
+             
+             ```        
+     - 调用ReflectOnApplicationType方法把事件装入ArrayList    
+         
+             
+             ``` C#   
+                private void CompileApplication() {
+                    // Get the Application Type and AppState from the global file
+                    /*从global文件中获得当前Application的类型和appState
+                     * */
+                    _theApplicationType = BuildManager.GetGlobalAsaxType();
+                    BuildResultCompiledGlobalAsaxType result = BuildManager.GetGlobalAsaxBuildResult();
+                    if (result != null) {
+                        if (result.HasAppOrSessionObjects) {
+                            GetAppStateByParsingGlobalAsax();
+                        }
+                        _fileDependencies = result.VirtualPathDependencies;
+                    }
+        
+                    if (_state == null) {
+                        _state = new HttpApplicationState();
+                    }
+                    ReflectOnApplicationType();
                 }
-            }
-            catch { 
-                throw;
-            }
-        }
-     
-     ```        
- - 调用ReflectOnApplicationType方法把事件装入ArrayList    
+        
+             
+             ``` 
+             
+             ``` C#  
+             
+               private void ReflectOnApplicationType() {
+                    ArrayList handlers = new ArrayList();
+                    MethodInfo[] methods;
+                    // get this class methods
+                    methods = _theApplicationType.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+                    foreach (MethodInfo m in methods) {
+                        if (ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
+                            handlers.Add(m);
+                    }
+                    Type baseType = _theApplicationType.BaseType;
+                    if (baseType != null && baseType != typeof(HttpApplication)) {
+                        methods = baseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                        foreach (MethodInfo m in methods) {
+                            if (m.IsPrivate && ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
+                                handlers.Add(m);
+                        }
+                    }
+                    _eventHandlerMethods = new MethodInfo[handlers.Count];
+                    for (int i = 0; i < _eventHandlerMethods.Length; i++)
+                        _eventHandlerMethods[i] = (MethodInfo)handlers[i];
+                }
+        
+             
+             ``` 
+          
+         
+#### ii. _theApplicationFactory.EnsureAppStartCalled(context)
  
-     
-     ``` C#   
-        private void CompileApplication() {
-            // Get the Application Type and AppState from the global file
-            /*从global文件中获得当前Application的类型和appState
-             * */
-            _theApplicationType = BuildManager.GetGlobalAsaxType();
-            BuildResultCompiledGlobalAsaxType result = BuildManager.GetGlobalAsaxBuildResult();
-            if (result != null) {
-                if (result.HasAppOrSessionObjects) {
-                    GetAppStateByParsingGlobalAsax();
-                }
-                _fileDependencies = result.VirtualPathDependencies;
-            }
-
-            if (_state == null) {
-                _state = new HttpApplicationState();
-            }
-            ReflectOnApplicationType();
-        }
-
-     
-     ``` 
-     
-     ``` C#  
-     
-       private void ReflectOnApplicationType() {
-            ArrayList handlers = new ArrayList();
-            MethodInfo[] methods;
-            // get this class methods
-            methods = _theApplicationType.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
-            foreach (MethodInfo m in methods) {
-                if (ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
-                    handlers.Add(m);
-            }
-            Type baseType = _theApplicationType.BaseType;
-            if (baseType != null && baseType != typeof(HttpApplication)) {
-                methods = baseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
-                foreach (MethodInfo m in methods) {
-                    if (m.IsPrivate && ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
-                        handlers.Add(m);
-                }
-            }
-            _eventHandlerMethods = new MethodInfo[handlers.Count];
-            for (int i = 0; i < _eventHandlerMethods.Length; i++)
-                _eventHandlerMethods[i] = (MethodInfo)handlers[i];
-        }
-
-     
-     ``` 
-  
- 
-#### _theApplicationFactory.EnsureAppStartCalled(context)
- 
-    创建特定的HttpApplication实例，触发ApplicationOnStart事件，执行ASP.global_asax中的Application_Start(object sender, EventArgs e)方法。这里创建的HttpApplication实例在处理完事件后，就被回收。 具体实现：   
+  > 创建特定的HttpApplication实例，触发ApplicationOnStart事件，执行ASP.global_asax中的Application_Start(object sender, EventArgs e)方法。这里创建的HttpApplication实例在处理完事件后，就被回收。 具体实现：   
     
     ``` C#  
     
@@ -317,9 +317,9 @@
             }
         }  
     ```
- - _theApplicationFactory.GetNormalApplicationInstance(context);     
+#### iii. _theApplicationFactory.GetNormalApplicationInstance(context);     
  
-   对于这个方法的理解，需要看下对应的代码：   
+    > 主要是获得HttpApplication实例，首先从队列中去取，如果取出为空，则利用反射创建，调用InitInternal方法
    
  ``` C#  
  
