@@ -1,4 +1,4 @@
-### Asp.Net执行入口    
+  
 
 上面两篇文章说了http协议和IIS处理，这次说下当IIS把请求交给Asp.net后，后续的过程。首先要确定IIS是如何调用Asp.net的程序的。       
 #### AppManagerAppDomain  
@@ -8,14 +8,7 @@
 ``` C#     
         public Object Create(String appId, String appPath) {
             try {
-                //
-                //  Fill app a Dictionary with 'binding rules' -- name value string pairs
-                //  for app domain creation
-                //
-
-                // 
-
-
+            
                 if (appPath[0] == '.') {
                     System.IO.FileInfo file = new System.IO.FileInfo(appPath);
                     appPath = file.FullName;
@@ -50,8 +43,17 @@
 
 
 ```      
- 2. 创建完成后，把请求交给ISAPIRuntime 中ProcessRequest方法
-#### ISAPIRuntime    
+ 2. 创建完成后，把请求交给ISAPIRuntime 中ProcessRequest方法     
+ 
+#### ISAPIRuntime--asp.net入口    
+ 
+ 1.  首先看下ISAPIRuntime中的ProcessRequest方法签名，代码如下：   
+ 
+ ``` C#     
+  public int ProcessRequest(IntPtr ecb, int iWRType);
+ 
+ ```   
+ 
 
 
 
