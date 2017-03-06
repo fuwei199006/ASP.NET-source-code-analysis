@@ -189,10 +189,81 @@
     
 #### 创建HttpApplication      
 
-1. 通过HttpApplicationFactory中的静态方法GetApplicationInstance来获得实例对象（常用的工厂模式），在创建对象的时候调用了_theApplicationFactory.EnsureInited();方法，来执行实例化操作，核心代码如下：     
+1. 通过HttpApplicationFactory中的静态方法GetApplicationInstance来获得实例对象（常用的工厂模式），在创建对象的时候调用了 _theApplicationFactory.GetNormalApplicationInstance(context);方法(其中context形参是上文创建的HttpContext）来执行实例化操作，核心代码如下：     
 
- ``` C#    
+ ``` C#       
+      
+        internal static IHttpHandler GetApplicationInstance(HttpContext context) {
+            if (_customApplication != null)
+                return _customApplication;
+
+            // Check to see if it's a debug auto-attach request
+            if (context.Request.IsDebuggingRequest)
+                return new HttpDebugHandler();
+            
+            _theApplicationFactory.EnsureInited();
+
+            _theApplicationFactory.EnsureAppStartCalled(context);
+
+            return _theApplicationFactory.GetNormalApplicationInstance(context);
+        }
+
+ ```          
  
+ 这个方法里有三个方法的调用，分别是：
  
- ```   
+ - _theApplicationFactory.EnsureInited();    
+ 
+     主要是对Global.asxc文件进行编译和处理，核心代码如下：   
+     
+     ``` C#   
+     
+     
+     
+     ```    
+ 
+ - _theApplicationFactory.EnsureAppStartCalled(context);    
+    创建特定的HttpApplication实例，触发ApplicationOnStart事件，执行ASP.global_asax中的Application_Start(object sender, EventArgs e)方法。这里创建的HttpApplication实例在处理完事件后，就被回收。
+ - _theApplicationFactory.GetNormalApplicationInstance(context);     
+ 
+   对于这个方法的理解，需要看下对应的代码：   
+   
+ ``` C#  
+ 
+    private HttpApplication GetNormalApplicationInstance(HttpContext context) {
+            HttpApplication app = null;
+
+            lock (_freeList) {
+                if (_numFreeAppInstances > 0) {
+                    app = (HttpApplication)_freeList.Pop();
+                    _numFreeAppInstances--;
+
+                    if (_numFreeAppInstances < _minFreeAppInstances) {
+                        _minFreeAppInstances = _numFreeAppInstances;
+                    }
+                }
+            }
+
+            if (app == null) {
+                // If ran out of instances, create a new one
+                app = (HttpApplication)HttpRuntime.CreateNonPublicInstance(_theApplicationType);
+
+                using (new ApplicationImpersonationContext()) {
+                   // 调用BuildSteps和获得所有的HttpModule
+                    app.InitInternal(context, _state, _eventHandlerMethods);
+                }
+            }
+
+            if (AppSettings.UseTaskFriendlySynchronizationContext) {
+                // When this HttpApplication instance is no longer in use, recycle it.
+                app.ApplicationInstanceConsumersCounter = new CountdownTask(1); // representing required call to HttpApplication.ReleaseAppInstance
+                app.ApplicationInstanceConsumersCounter.Task.ContinueWith((_, o) => RecycleApplicationInstance((HttpApplication)o), app, TaskContinuationOptions.ExecuteSynchronously);
+            }
+            return app;
+        }
+ 
+ ```     
+ 
+
+ 
 
