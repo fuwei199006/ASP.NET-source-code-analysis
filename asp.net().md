@@ -236,7 +236,7 @@
  
  - _theApplicationFactory.EnsureInited();    
  
-     主要是对Global.asxc文件进行编译和处理，核心代码如下：   
+     主要是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
      
      ``` C#   
         private void EnsureInited() {
@@ -248,8 +248,10 @@
                     }
                 }
             }
-        }  
-        
+        } 
+    ```   
+    对global.asax进行编译
+    ``` C#   
       private void Init() {
             if (_customApplication != null)
                 return;
@@ -339,7 +341,8 @@
             return app;
         }
  
- ```     
+ ```       
+ 从上面
  
 
  
