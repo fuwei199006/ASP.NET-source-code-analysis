@@ -56,7 +56,30 @@
  ProcessRequest有两个参数，一个是请求报文的ecb句柄，一个请求的线程的类型（此处尚有争议），在运行的过程中，ecb首先被再次封装成托管资源的请求报文。 把封装好的代码传递给HttpRuntime类中的ProcessRequestNoDemand. 核心代码如下：   
  
  ``` C#   
- 
+  bool useOOP = (iWRType == WORKER_REQUEST_TYPE_OOP);
+    wr = ISAPIWorkerRequest.CreateWorkerRequest(ecb, useOOP);
+    wr.Initialize();
+    
+    // check if app path matches (need to restart app domain?)                
+    String wrPath = wr.GetAppPathTranslated();
+    String adPath = HttpRuntime.AppDomainAppPathInternal;
+    
+    if (adPath == null ||
+        StringUtil.EqualsIgnoreCase(wrPath, adPath))
+    {
+    
+        HttpRuntime.ProcessRequestNoDemand(wr);
+        return 0;
+    }
+    else
+    {
+        // need to restart app domain
+        HttpRuntime.ShutdownAppDomain(ApplicationShutdownReason.PhysicalApplicationPathChanged,
+                                      SR.GetString(SR.Hosting_Phys_Path_Changed,
+                                                                       adPath,
+                                                                       wrPath));
+        return 1;
+    }
  ```   
  
 
