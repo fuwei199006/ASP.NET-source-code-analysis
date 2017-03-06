@@ -207,6 +207,28 @@
 
             return _theApplicationFactory.GetNormalApplicationInstance(context);
         }
+        
+         private void Init() {
+            if (_customApplication != null)
+                return;
+
+            try {
+                try {
+                    _appFilename = GetApplicationFile();
+
+                    //编译
+                    CompileApplication();
+                }
+                finally {
+                    // Always set up global.asax file change notification, even if compilation
+                    // failed.  This way, if the problem is fixed, the appdomain will be restarted.
+                    SetupChangesMonitor();
+                }
+            }
+            catch { // Protect against exception filters
+                throw;
+            }
+        }
 
  ```          
  
@@ -217,7 +239,16 @@
      主要是对Global.asxc文件进行编译和处理，核心代码如下：   
      
      ``` C#   
-     
+        private void EnsureInited() {
+            if (!_inited) {
+                lock (this) {
+                    if (!_inited) {
+                        Init();
+                        _inited = true;
+                    }
+                }
+            }
+        }
      
      
      ```    
