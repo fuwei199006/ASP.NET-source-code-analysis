@@ -1,6 +1,6 @@
 上面两篇文章说了http协议和IIS处理，这次说下当IIS把请求交给Asp.net后，后续的过程。首先要确定IIS是如何调用Asp.net的程序的。
 
-#### AppManagerAppDomain
+### AppManagerAppDomain
 
 1. 当IIS把请求交给asp.net时候，如果AppDomain还不存在则创建APPDomain，将AppDomain指派给与请求对应的应用程序，这通过AppManagerAppDomain类中的Create方法实现，代码如下：   
 
@@ -43,7 +43,7 @@
 
 1. 创建完成后，把请求交给ISAPIRuntime 中ProcessRequest方法     
 
-#### ISAPIRuntime--asp.net入口
+### ISAPIRuntime--asp.net入口
 
 1. 首先看下ISAPIRuntime中的ProcessRequest方法签名
 
@@ -80,7 +80,7 @@
    }
    ```
 
-   #### HttpRuntime
+### HttpRuntime
 
 2. HttpRuntime收到传递过来的HttpWorkerRequest类的实例对象wr,通过调用当前类中的ProcessRequestNow方法，把参数传递给ProcessRequestInternal（ProcessRequestNow的调用了ProcessRequestInternal）。
 
@@ -170,7 +170,7 @@
     ```     
 
 
-#### HttpContext对象
+### HttpContext对象
 
 这个对象是一个请求响应的结合体，里面包含了HttpRequest和HttpResponse对象，在构造HttpContext对象时，同时也对HttpRequest和HttpResponse也进行了初始化，代码如下：   
 
@@ -187,7 +187,7 @@
     
     ```    
     
-#### 创建HttpApplication      
+### 创建HttpApplication      
 
 1. 通过HttpApplicationFactory中的静态方法GetApplicationInstance来获得实例对象（常用的工厂模式），在创建对象的时候调用了 _theApplicationFactory.GetNormalApplicationInstance(context);方法(其中context形参是上文创建的HttpContext）来执行实例化操作，核心代码如下：     
 
@@ -208,54 +208,20 @@
             return _theApplicationFactory.GetNormalApplicationInstance(context);
         }
         
-         private void Init() {
-            if (_customApplication != null)
-                return;
-
-            try {
-                try {
-                    _appFilename = GetApplicationFile();
-
-                    //编译
-                    CompileApplication();
-                }
-                finally {
-                    // Always set up global.asax file change notification, even if compilation
-                    // failed.  This way, if the problem is fixed, the appdomain will be restarted.
-                    SetupChangesMonitor();
-                }
-            }
-            catch { // Protect against exception filters
-                throw;
-            }
-        }
-
  ```          
  
  这个方法里有三个方法的调用，分别是：
  
- - _theApplicationFactory.EnsureInited();    
+ #### _theApplicationFactory.EnsureInited()    
  
-     - 主要是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
+ > 这个方法的主要功能是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
      
-     ``` C#   
-        private void EnsureInited() {
-            if (!_inited) {
-                lock (this) {
-                    if (!_inited) {
-                        Init();
-                        _inited = true;
-                    }
-                }
-            }
-        } 
-    ```   
-    - 找到global.asax路径进行编译
+     
+ - 找到global.asax路径进行编译
     ``` C#   
       private void Init() {
             if (_customApplication != null)
                 return;
-
             try {
                 try {
                     _appFilename = GetApplicationFile();
@@ -275,7 +241,8 @@
         }
      
      ```        
-     - 调用ReflectOnApplicationType方法把事件装入ArrayList  
+ - 调用ReflectOnApplicationType方法把事件装入ArrayList    
+ 
      
      ``` C#   
         private void CompileApplication() {
@@ -305,9 +272,6 @@
        private void ReflectOnApplicationType() {
             ArrayList handlers = new ArrayList();
             MethodInfo[] methods;
-
-            Debug.Trace("PipelineRuntime", "ReflectOnApplicationType");
-
             // get this class methods
             methods = _theApplicationType.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
             foreach (MethodInfo m in methods) {
@@ -335,7 +299,8 @@
      ``` 
   
  
- - _theApplicationFactory.EnsureAppStartCalled(context);    
+#### _theApplicationFactory.EnsureAppStartCalled(context)
+ 
     创建特定的HttpApplication实例，触发ApplicationOnStart事件，执行ASP.global_asax中的Application_Start(object sender, EventArgs e)方法。这里创建的HttpApplication实例在处理完事件后，就被回收。 具体实现：   
     
     ``` C#  
