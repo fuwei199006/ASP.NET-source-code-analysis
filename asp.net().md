@@ -248,13 +248,59 @@
                     }
                 }
             }
+        }  
+        
+      private void Init() {
+            if (_customApplication != null)
+                return;
+
+            try {
+                try {
+                    _appFilename = GetApplicationFile();
+
+                    //编译
+                    CompileApplication();
+                }
+                finally {
+                    // Always set up global.asax file change notification, even if compilation
+                    // failed.  This way, if the problem is fixed, the appdomain will be restarted.
+                    SetupChangesMonitor();
+                }
+            }
+            catch { // Protect against exception filters
+                throw;
+            }
         }
      
+     ```      
      
-     ```    
+  
  
  - _theApplicationFactory.EnsureAppStartCalled(context);    
-    创建特定的HttpApplication实例，触发ApplicationOnStart事件，执行ASP.global_asax中的Application_Start(object sender, EventArgs e)方法。这里创建的HttpApplication实例在处理完事件后，就被回收。
+    创建特定的HttpApplication实例，触发ApplicationOnStart事件，执行ASP.global_asax中的Application_Start(object sender, EventArgs e)方法。这里创建的HttpApplication实例在处理完事件后，就被回收。 具体实现：   
+    
+    ``` C#  
+    
+     private void EnsureAppStartCalled(HttpContext context) {
+            if (!_appOnStartCalled) {
+                lock (this) {
+                    if (!_appOnStartCalled) {
+                        using (new DisposableHttpContextWrapper(context)) {
+                            // impersonation could be required (UNC share or app credentials)
+
+                            WebBaseEvent.RaiseSystemEvent(this, WebEventCodes.ApplicationStart);
+
+                            // fire outside of impersonation as HttpApplication logic takes
+                            // care of impersonation by itself
+                            FireApplicationOnStart(context);
+                        }
+
+                        _appOnStartCalled = true;
+                    }
+                }
+            }
+        }  
+    ```
  - _theApplicationFactory.GetNormalApplicationInstance(context);     
  
    对于这个方法的理解，需要看下对应的代码：   
