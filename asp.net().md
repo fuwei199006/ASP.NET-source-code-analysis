@@ -236,7 +236,7 @@
  
  - _theApplicationFactory.EnsureInited();    
  
-     主要是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
+     - 主要是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
      
      ``` C#   
         private void EnsureInited() {
@@ -250,7 +250,7 @@
             }
         } 
     ```   
-    对global.asax进行编译
+    - 找到global.asax路径进行编译
     ``` C#   
       private void Init() {
             if (_customApplication != null)
@@ -274,8 +274,65 @@
             }
         }
      
-     ```      
+     ```        
+     - 调用ReflectOnApplicationType方法把事件装入ArrayList  
      
+     ``` C#   
+        private void CompileApplication() {
+            // Get the Application Type and AppState from the global file
+            /*从global文件中获得当前Application的类型和appState
+             * */
+            _theApplicationType = BuildManager.GetGlobalAsaxType();
+            BuildResultCompiledGlobalAsaxType result = BuildManager.GetGlobalAsaxBuildResult();
+            if (result != null) {
+                if (result.HasAppOrSessionObjects) {
+                    GetAppStateByParsingGlobalAsax();
+                }
+                _fileDependencies = result.VirtualPathDependencies;
+            }
+
+            if (_state == null) {
+                _state = new HttpApplicationState();
+            }
+            ReflectOnApplicationType();
+        }
+
+     
+     ``` 
+     
+     ``` C#  
+     
+       private void ReflectOnApplicationType() {
+            ArrayList handlers = new ArrayList();
+            MethodInfo[] methods;
+
+            Debug.Trace("PipelineRuntime", "ReflectOnApplicationType");
+
+            // get this class methods
+            methods = _theApplicationType.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+            foreach (MethodInfo m in methods) {
+                if (ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
+                    handlers.Add(m);
+            }
+            
+            // get base class private methods (GetMethods would not return those)
+            Type baseType = _theApplicationType.BaseType;
+            if (baseType != null && baseType != typeof(HttpApplication)) {
+                methods = baseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+                foreach (MethodInfo m in methods) {
+                    if (m.IsPrivate && ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
+                        handlers.Add(m);
+                }
+            }
+
+            // remember as an array
+            _eventHandlerMethods = new MethodInfo[handlers.Count];
+            for (int i = 0; i < _eventHandlerMethods.Length; i++)
+                _eventHandlerMethods[i] = (MethodInfo)handlers[i];
+        }
+
+     
+     ``` 
   
  
  - _theApplicationFactory.EnsureAppStartCalled(context);    
