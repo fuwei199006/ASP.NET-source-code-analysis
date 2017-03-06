@@ -151,11 +151,10 @@
             }
     }
     
-```    
-    
-
+```     
 
 3. 根据上面代码，当获得HttApplication对象后，判断是否是IHttpAsyncHandler类型，如果是则调用BeginProcessRequest方法，此处的if条件是一直成立的，因为HttpApplication实现了IHttpAsyncHandler接口,而ProcessRequest方法的实现也仅仅是抛出了一个异常，笔者觉得此处应该是微软留了一个扩展的地方。     
+    
 
 ``` C#    
 
