@@ -88,9 +88,76 @@
  
  ``` C#  
  
+        internal static void ProcessRequestNoDemand(HttpWorkerRequest wr) {
+            RequestQueue rq = _theRuntime._requestQueue;
+
+            wr.UpdateInitialCounters();
+
+            if (rq != null)  // could be null before first request
+                wr = rq.GetRequestToExecute(wr);
+
+            if (wr != null) {
+                CalculateWaitTimeAndUpdatePerfCounter(wr);
+                wr.ResetStartTime();
+                ProcessRequestNow(wr);
+            }
+        }
+        
+        internal static void ProcessRequestNow(HttpWorkerRequest wr) {
+            _theRuntime.ProcessRequestInternal(wr);
+        }
+
  ```  
  
- 2. 在ProcessRequestInternal方法的内部，实现对HttpContext类的对象实例的创建。
+ 2. 在ProcessRequestInternal方法的内部，实现对HttpContext类和HttpApplicationFactory的对象实例的创建。核心代码：     
+
+``` C#　　 
+
+    private void ProcessRequestInternal(HttpWorkerRequest wr) {
+    
+            ...
+            
+            HttpContext context;
+            try {
+                context = new HttpContext(wr, false /* initResponseWriter */);
+            } 
+            catch {
+               ...
+            }
+            
+               ...
+            
+            try {
+                ...
+                
+                IHttpHandler app = HttpApplicationFactory.GetApplicationInstance(context);
+                
+                ...
+                
+                if (app is IHttpAsyncHandler) {
+                    // asynchronous handler
+                    IHttpAsyncHandler asyncHandler = (IHttpAsyncHandler)app;
+                    context.AsyncAppHandler = asyncHandler;
+                    asyncHandler.BeginProcessRequest(context, _handlerCompletionCallback, context);
+                }
+                else {
+                    // synchronous handler
+                    app.ProcessRequest(context);
+                    FinishRequest(context.WorkerRequest, context, null);
+                }
+            }
+            catch (Exception e) {
+                  ....
+            }
+    }
+```      
+
+3. 根据上面代码，当获得HttApplication对象后，判断是否是IHttpAsyncHandler类型，如果是则调用BeginProcessRequest方法，此处的if条件是一直成立的，因为HttpApplication实现了IHttpAsyncHandler接口,而ProcessRequest方法的实现也仅仅是抛出了一个异常，笔者觉得此处应该是微软留了一个扩展的地方。 
+
+``` C#  
+
+
+```   
 
  
  
