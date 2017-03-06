@@ -319,8 +319,8 @@
     ```
 #### iii. _theApplicationFactory.GetNormalApplicationInstance(context);     
  
-    > 主要是获得HttpApplication实例，首先从队列中去取，如果取出为空，则利用反射创建，调用InitInternal方法
-   
+    > 主要是获得HttpApplication实例，首先从队列中去取，如果取出为空，则利用反射创建，调用InitInternal方法            
+     
  ``` C#  
  
     private HttpApplication GetNormalApplicationInstance(HttpContext context) {
@@ -356,7 +356,8 @@
         }
  
  ```       
- 从上面
+ 从代码中可以分析到,在HttpApplication创建的过程中，是有一个_freeList的一个堆栈来控制的。当对象创建成功后，执行app.InitInternal(context, _state, _eventHandlerMethods)来进行后续的操作。整个的代码流程，可以理解成以下过程：     
+ 
  
 
  
