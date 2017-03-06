@@ -212,9 +212,9 @@
  
  这个方法里有三个方法的调用，分别是：
  
- #### _theApplicationFactory.EnsureInited()    
+ ####  _theApplicationFactory.EnsureInited()    
  
- > 这个方法的主要功能是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
+ >  主要功能是对Global.asxc文件进行编译和处理，并反射出对其中的事件，放到ArrayList中，核心代码如下：   
      
      
  - 找到global.asax路径进行编译
@@ -225,17 +225,13 @@
             try {
                 try {
                     _appFilename = GetApplicationFile();
-
-                    //编译
                     CompileApplication();
                 }
                 finally {
-                    // Always set up global.asax file change notification, even if compilation
-                    // failed.  This way, if the problem is fixed, the appdomain will be restarted.
                     SetupChangesMonitor();
                 }
             }
-            catch { // Protect against exception filters
+            catch { 
                 throw;
             }
         }
@@ -278,8 +274,6 @@
                 if (ReflectOnMethodInfoIfItLooksLikeEventHandler(m))
                     handlers.Add(m);
             }
-            
-            // get base class private methods (GetMethods would not return those)
             Type baseType = _theApplicationType.BaseType;
             if (baseType != null && baseType != typeof(HttpApplication)) {
                 methods = baseType.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
@@ -288,8 +282,6 @@
                         handlers.Add(m);
                 }
             }
-
-            // remember as an array
             _eventHandlerMethods = new MethodInfo[handlers.Count];
             for (int i = 0; i < _eventHandlerMethods.Length; i++)
                 _eventHandlerMethods[i] = (MethodInfo)handlers[i];
