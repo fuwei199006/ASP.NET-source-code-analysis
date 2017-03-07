@@ -47,7 +47,7 @@
    public int ProcessRequest(IntPtr ecb, int iWRType);
    ```
 
-   ProcessRequest有两个参数，一个是请求报文的ecb句柄，一个请求的线程的类型（此处尚有争议,对于源码的阅读没有实质的障碍），在运行的过程中，ecb首先被再次封装成托管资源的请求报文wr。 把封装好的代码传递给HttpRuntime类中的ProcessRequestNoDemand. 核心代码如下：
+   ProcessRequest有两个参数，一个是请求报文的ecb句柄，一个请求的类型，在运行的过程中，ecb首先被再次封装成托管资源的请求报文wr。 把封装好的代码传递给HttpRuntime类中的ProcessRequestNoDemand. 核心代码如下：
 
    ```C\#
    bool useOOP = (iWRType == WORKER_REQUEST_TYPE_OOP);
