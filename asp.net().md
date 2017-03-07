@@ -352,8 +352,13 @@
         }
  
  ```       
- 从代码中可以分析到,在HttpApplication创建的过程中，是有一个_freeList的一个堆栈来控制的。当对象创建成功后，执行app.InitInternal(context, _state, _eventHandlerMethods)来进行后续的操作。整个的代码流程，可以理解成以下过程：     
- ![](/assets/一.png)       
+ 从代码中可以分析到,在HttpApplication创建的过程中，是有一个_freeList的一个堆栈来控制的。当对象创建成功后，执行app.InitInternal(context, _state, _eventHandlerMethods)来进行后续的操作。整个的代码流程，可以理解成以下过程：        
+ 
+ ![](/assets/一.png)    
+ 
+ 
+ 
+ 写于 2017.03.07
  
  
  
