@@ -1,4 +1,4 @@
-上面两篇文章说了http协议和IIS处理，这次说下当IIS把请求交给Asp.net后，后续的过程。首先要确定IIS是如何调用Asp.net的程序的。
+上面两篇文章说了http协议和IIS处理，这次说下当IIS把请求交给Asp.net后的过程。
 
 ### AppManagerAppDomain
 
@@ -17,17 +17,13 @@
                     appPath = appPath + "\\";
                 }
 
-                // Create new app domain via App Manager
-#if FEATURE_PAL // FEATURE_PAL does not enable IIS-based hosting features
-                throw new NotImplementedException("ROTORTODO");
-#else // FEATURE_PAL 
+                ...
 
                 ISAPIApplicationHost appHost = new ISAPIApplicationHost(appId, appPath, false /*validatePhysicalPath*/);
 
                 //创建环境，包括编译环境
                 ISAPIRuntime isapiRuntime = (ISAPIRuntime)_appManager.CreateObjectInternal(appId, typeof(ISAPIRuntime), appHost, 
                         false /*failIfExists*/, null /*hostingParameters*/);
-
 
                 isapiRuntime.StartProcessing();
 
@@ -41,7 +37,7 @@
         }
 ```
 
-1. 创建完成后，把请求交给ISAPIRuntime 中ProcessRequest方法     
+2. 创建完成后，把请求交给ISAPIRuntime 中ProcessRequest方法     
 
 ### ISAPIRuntime--asp.net入口
 
@@ -82,7 +78,7 @@
 
 ### HttpRuntime
 
-2. HttpRuntime收到传递过来的HttpWorkerRequest类的实例对象wr,通过调用当前类中的ProcessRequestNow方法，把参数传递给ProcessRequestInternal（ProcessRequestNow的调用了ProcessRequestInternal）。
+1. HttpRuntime收到传递过来的HttpWorkerRequest类的实例对象wr,通过调用当前类中的ProcessRequestNow方法，把参数传递给ProcessRequestInternal（ProcessRequestNow的调用了ProcessRequestInternal）。
 
    ```C\#
        internal static void ProcessRequestNoDemand(HttpWorkerRequest wr) {
@@ -105,7 +101,7 @@
        }
    ```
 
-3. 在ProcessRequestInternal中，创建了HttpContext和HttpApplication对象实例，核心代码如下    
+2. 在ProcessRequestInternal中，创建了HttpContext和HttpApplication对象实例，核心代码如下    
 
     ``` C#   
  
@@ -152,7 +148,7 @@
         }
       }
     ```      
-4. 在ProcessRequestInternal方法的内部，实现对HttpContext类和HttpApplicationFactory的对象实例的创建，核心代码: 根据上面代码，当获得HttApplication对象后，判断是否是IHttpAsyncHandler类型，如果是则调用BeginProcessRequest方法，此处的if条件是一直成立的，因为HttpApplication实现了IHttpAsyncHandler接口,而ProcessRequest方法的实现也仅仅是抛出了一个异常，笔者觉得此处应该是微软留了一个扩展的地方。    
+3. 在ProcessRequestInternal方法的内部，实现对HttpContext类和HttpApplicationFactory的对象实例的创建，核心代码: 根据上面代码，当获得HttApplication对象后，判断是否是IHttpAsyncHandler类型，如果是则调用BeginProcessRequest方法，此处的if条件是一直成立的，因为HttpApplication实现了IHttpAsyncHandler接口,而ProcessRequest方法的实现也仅仅是抛出了一个异常，笔者觉得此处应该是微软留了一个扩展的地方。    
 
     ``` C#  
       public class HttpApplication : IComponent, 
@@ -357,6 +353,9 @@
  
  ```       
  从代码中可以分析到,在HttpApplication创建的过程中，是有一个_freeList的一个堆栈来控制的。当对象创建成功后，执行app.InitInternal(context, _state, _eventHandlerMethods)来进行后续的操作。整个的代码流程，可以理解成以下过程：     
+ ![](/assets/一.png)       
+ 
+ 
  
  
 
