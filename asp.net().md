@@ -2,7 +2,7 @@
 
 ### AppManagerAppDomainFactory
 
-1. 当IIS把请求交给asp.net时候，如果AppDomain还不存在则创建APPDomain，将AppDomain指派给与请求对应的应用程序，这通过AppManagerAppDomain类中的Create方法实现，代码如下：   
+1. 当IIS把请求交给asp.net时候，如果AppDomain还不存在则创建APPDomain，将AppDomain指派给与请求对应的应用程序，这通过AppManagerAppDomainFactory类中的Create方法实现，代码如下：   
 
 ```C\#
         public Object Create(String appId, String appPath) {
