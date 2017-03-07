@@ -37,7 +37,7 @@
         }
 ```
 
-2. 创建完成后，把请求交给ISAPIRuntime 中ProcessRequest方法     
+2. 创建完成后，非托管代码开始调用 ISAPIRuntime 中ProcessRequest方法(通过COM调用 )   
 
 ### ISAPIRuntime--asp.net入口
 
