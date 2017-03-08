@@ -9,9 +9,8 @@
 ##### httpModule使用实例  
 
 1. HttpModule在Asp.net中有重要的作用，可以HttpApplication的事件进行订阅，也可以修改对应的响应的内容 
+
 2. 对于HttpModule的初始化,asp.Net中会根据当前应用程序池的类型进行初始化，核心代码如下：      
-
-
 ``` C#    
    if (HttpRuntime.UseIntegratedPipeline) {
         try {
@@ -27,36 +26,7 @@
     else {
         InitModules();
     }
-  }   if (HttpRuntime.UseIntegratedPipeline) {
-        try {
-            context.HideRequestResponse = true;
-            _hideRequestResponse = true;
-            InitIntegratedModules();
-        }
-        finally {
-            context.HideRequestResponse = false;
-            _hideRequestResponse = false;
-        }
-    }
-    else {
-        InitModules();
-    }
-  } 
-   if (HttpRuntime.UseIntegratedPipeline) {
-        try {
-            context.HideRequestResponse = true;
-            _hideRequestResponse = true;
-            InitIntegratedModules();
-        }
-        finally {
-            context.HideRequestResponse = false;
-            _hideRequestResponse = false;
-        }
-    }
-    else {
-        InitModules();
-    }
-  }
+  }   
 ```  
 
 
