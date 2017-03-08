@@ -6,7 +6,9 @@
 
 #### 初始化HttpModule      
 
-##### httpModule使用实例  
+##### httpModule使用实例     
+
+##### asp.net中HttpModule的处理
 
 1. HttpModule在Asp.net中有重要的作用，可以HttpApplication的事件进行订阅，也可以修改对应的响应的内容 
 
@@ -27,7 +29,13 @@
         InitModules();
     }
   }   
-```  
+```   
+3. 对于集成模式，获得所有Modules的方法是调用非托管的方法的进行获得，具体获得的代码如下:     
+
+``` C#    
+
+
+```    
 
 
 
