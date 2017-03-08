@@ -32,7 +32,14 @@
 ```   
 3. 对于集成模式，获得所有Modules的方法是调用非托管的方法的进行获得，具体获得的代码如下:     
 
-``` C#    
+``` C#      
+
+ [DllImport(_IIS_NATIVE_DLL)]
+    internal static extern int MgdGetModuleCollection(
+        IntPtr            pConfigSystem,
+        IntPtr            appContext,
+        out IntPtr        pModuleCollection,
+        out int           count);
 
 
 ```    
