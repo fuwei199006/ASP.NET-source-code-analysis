@@ -6,7 +6,41 @@
 
 #### 初始化HttpModule      
 
-##### httpModule使用实例     
+##### httpModule使用实例    
+
+   对于HttpModule，个人觉得应该首先看下是怎么使用的：   
+   
+  1. 新建一个项目，添加一个webform的窗体default.aspx       
+  2. 添加一个MyModule.cs,继承自IHttpModule。     
+  3. 在IHttpMoudule中有两个方法，在MyModule中必须要实现：         
+  
+  ``` C#       
+    public void Init(HttpApplication context)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            throw new System.NotImplementedException();
+        }
+  
+  ```      
+  4. 在Init方法中，有一个HttpApplication类型的对象context，这里可以对其中的响应的内容进行更改，修改如下：      
+  ``` C#    
+  
+   public void Init(HttpApplication context)
+    {
+        context.EndRequest += Context_EndRequest;
+    }
+
+    private void Context_EndRequest(object sender, System.EventArgs e)
+    {
+        var context = (HttpApplication) sender;
+        context.Response.Write("<h1>Hello MyModule</h1>");
+    }
+  
+  ```    
 
 ##### asp.net中HttpModule的处理
 
