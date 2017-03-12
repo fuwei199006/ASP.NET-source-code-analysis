@@ -131,10 +131,22 @@
  
  ```     
  
- 6. 最终会调用 InitModulesCommon方法    
+ 6. 最终会调用 InitModulesCommon方法,循环调用Modules中的方法    
  
  ``` C#   
- 
+       private void InitModulesCommon() {
+            int n = _moduleCollection.Count;
+
+            for (int i = 0; i < n; i++) {
+                // remember the module being inited for event subscriptions
+                // we'll later use this for routing
+                _currentModuleCollectionKey = _moduleCollection.GetKey(i);
+                _moduleCollection[i].Init(this);
+            }
+
+            _currentModuleCollectionKey = null;
+            InitAppLevelCulture();
+        }
  
  ``` 
 
