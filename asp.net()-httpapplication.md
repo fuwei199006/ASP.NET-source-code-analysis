@@ -95,7 +95,8 @@
             InitModulesCommon();
          }   
     ```       
-    - _moduleConfigInfo 的来源     
+    - _moduleConfigInfo 的来源    
+     这个_moduleConfigInfo的来源，还需要追到上篇 HttpApplication中三个方法的调用（EnsureAppStartCalled 第二个方法的调用）   
     ``` C#     
     
     
