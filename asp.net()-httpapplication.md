@@ -10,7 +10,7 @@
 
    对于HttpModule，个人觉得应该首先看下是怎么使用的：   
    
-  1. 新建一个项目，添加一个webform的窗体default.aspx，使用IIS添加到网站，使用集成模式。      
+  1. 新建一个项目，添加一个webform的窗体default.aspx，使用IIS添加到网站，应用程序池使用集成模式。      
   2. 添加一个MyModule.cs,继承自IHttpModule。     
   3. 在IHttpMoudule中有两个方法，在MyModule中必须要实现：         
   
@@ -50,7 +50,16 @@
   运行结果如下：   
   ![](/assets/HttpModule.png)     
   
-  6.在
+  6.在上面的例子中，使用的是集成模式，当改成经典模式的时候，module又不起作用了。对于经典模式的配置文件与集成模式不同。经典模式的配置文件如下：    
+  
+  ``` xml    
+<httpModules>
+        <add name="MyModule" type="IISIntegratedPipeline.MyModule,IISIntegratedPipeline"/>
+</httpModules>
+  
+  ```      
+  
+  7.对于 module的使用，有了一个简单的认识，在asp.net中module是一个灵活的配置，可以对请求进行自定义的处理。 
   
 
 ##### asp.net中HttpModule的处理
