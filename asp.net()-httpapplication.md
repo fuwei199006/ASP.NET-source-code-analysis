@@ -96,11 +96,13 @@
          }   
     ```       
     - _moduleConfigInfo 的来源    
-     这个_moduleConfigInfo的来源，还需要追到上篇 HttpApplication中三个方法的调用（EnsureAppStartCalled 第二个方法的调用）   
-    ``` C#     
+     这个_moduleConfigInfo的来源，还需要追到上篇 HttpApplication中三个方法的调用（EnsureAppStartCalled 第二个方法的调用）具体调用步骤如下：     
+     
+     EnsureAppStartCalled --> FireApplicationOnStart --> GetSpecialApplicationInstance
+     
+    -->  app.InitSpecial --> RegisterEventSubscriptionsWithIIS--> GetModuleCollection 
     
-    
-   ```      
+   --> GetConfigInfoForDynamicModules-->UnsafeIISMethods.MgdGetModuleCollection  而最终的的调用来自于非托管代码 
     
 
 ``` C#      
