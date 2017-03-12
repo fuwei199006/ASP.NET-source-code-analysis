@@ -151,11 +151,65 @@
  ``` 
 
 
+#### Global内的方法调用      
 
-#### Global内的方法调用     
+对于Global方法的调用，是调用HookupEventHandlersForApplicationAndModules(handlers);方法，这里的Handlers的收集和创建来源于上篇讲HttpAplication的三个方法调用的第一个方法。具体的看下上次的代码，这里不多叙述。对于方法的handlers的调用的核心代码如下,其实也是一个循环加上判断：    
+``` C#   
+
+   for (int i = 0; i < handlers.Length; i++) {
+                MethodInfo appMethod = handlers[i];
+                String appMethodName = appMethod.Name;
+                int namePosIndex = appMethodName.IndexOf('_');
+                String targetName = appMethodName.Substring(0, namePosIndex);
+
+                 ...
+                ParameterInfo[] addMethodParams = addMethod.GetParameters();
+
+                if (addMethodParams.Length != 1)
+                    continue;
+ 
+                Delegate handlerDelegate = null;
+
+                ParameterInfo[] appMethodParams = appMethod.GetParameters();
+
+                ...
+            
+                try {
+                    addMethod.Invoke(target, new Object[1]{handlerDelegate});
+                }
+                catch {
+                    if (HttpRuntime.UseIntegratedPipeline) {
+                        throw;
+                    }
+                }
+
+                if (eventName != null) {
+                    if (_pipelineEventMasks.ContainsKey(eventName)) {
+                        if (!StringUtil.StringStartsWith(eventName, "Post")) {
+                            _appRequestNotifications |= _pipelineEventMasks[eventName];
+                        }
+                        else {
+                            _appPostNotifications |= _pipelineEventMasks[eventName];
+                        }
+                    }
+                }
+            }
+
+```    
 
 
 #### 根据应用程序池的类型创建不同的_stepManager      
 
+这里很简单，直接看代码：    
+``` C#    
+// Construct the execution steps array
+if (HttpRuntime.UseIntegratedPipeline) {
+    _stepManager = new PipelineStepManager(this);
+}
+else {
+    _stepManager = new ApplicationStepManager(this);
+}
+
+```
 
 #### 执行BuildStep
