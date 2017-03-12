@@ -10,7 +10,7 @@
 
    对于HttpModule，个人觉得应该首先看下是怎么使用的：   
    
-  1. 新建一个项目，添加一个webform的窗体default.aspx       
+  1. 新建一个项目，添加一个webform的窗体default.aspx，使用IIS添加到网站，使用集成模式。      
   2. 添加一个MyModule.cs,继承自IHttpModule。     
   3. 在IHttpMoudule中有两个方法，在MyModule中必须要实现：         
   
@@ -47,7 +47,11 @@
    <add name="MyModule" type="Application.MyModule,Application"/>  
    
   ```    
-  运行结果如下
+  运行结果如下：   
+  ![](/assets/HttpModule.png)     
+  
+  6.在
+  
 
 ##### asp.net中HttpModule的处理
 
