@@ -116,7 +116,24 @@
 
 
 ```     
-5.对于经典模式，Module的获得是调用配置文件  
+5.对于经典模式获得Modules简单的多，直接获得是调用配置文件    
+
+ ``` C#    
+  private void InitModules()
+  {
+    HttpModulesSection pconfig = RuntimeConfig.GetAppConfig().HttpModules;
+
+    // get the static list, then add the dynamic members
+    HttpModuleCollection moduleCollection = pconfig.CreateModules();
+    HttpModuleCollection dynamicModules = CreateDynamicModules();
+
+    moduleCollection.AppendCollection(dynamicModules);
+    _moduleCollection = moduleCollection; // don't assign until all ops have succeeded
+
+    InitModulesCommon();
+   }
+ 
+ ```   
 
 
 
