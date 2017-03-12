@@ -29,7 +29,7 @@
   4. 在Init方法中，有一个HttpApplication类型的对象context，这里可以对其中的响应的内容进行更改，修改如下：      
   ``` C#    
   
-   public void Init(HttpApplication context)
+    public void Init(HttpApplication context)
     {
         context.EndRequest += Context_EndRequest;
     }
@@ -40,7 +40,14 @@
         context.Response.Write("<h1>Hello MyModule</h1>");
     }
   
+  ```        
+  5. 添加web.config文件如下（在  <system.webServer><modules>节点下面）：    
+  
+  ``` xml    
+   <add name="MyModule" type="Application.MyModule,Application"/>  
+   
   ```    
+  运行结果如下
 
 ##### asp.net中HttpModule的处理
 
