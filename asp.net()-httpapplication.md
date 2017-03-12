@@ -129,7 +129,9 @@
     InitModulesCommon();
    }
  
- ```   
+ ```     
+ 
+ 6. 最终会调用 InitModulesCommon方法
 
 
 
