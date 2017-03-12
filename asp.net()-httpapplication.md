@@ -59,12 +59,12 @@
   
   ```      
   
-  7.对于 module的使用，有了一个简单的认识，在asp.net中module是一个灵活的配置，可以对请求进行自定义的处理。 
+  7.对于 module的使用，有了一个简单的认识，在asp.net中module是一个灵活的配置，可以对请求进行自定义的处理，对于Asp.net如何处理的，在下面详细解说。
   
 
 ##### asp.net中HttpModule的处理
 
-1. HttpModule在Asp.net中有重要的作用，可以HttpApplication的事件进行订阅，也可以修改对应的响应的内容 
+1. 结合上面例子，HttpModule在Asp.net中有重要的作用，可以HttpApplication的事件进行订阅，也可以修改对应的响应的内容 
 
 2. 对于HttpModule的初始化,asp.Net中会根据当前应用程序池的类型进行初始化，核心代码如下：      
 ``` C#    
@@ -83,8 +83,18 @@
         InitModules();
     }
   }   
-```   
-3. 对于集成模式，获得所有Modules的方法是调用非托管的方法的进行获得，具体获得的代码如下:     
+```     
+3. 对于Module的理解，需要根据应用程序池的模式来处理（经典和集成）。
+4. 对于集成模式，获得所有Modules的方法是调用非托管的方法的进行获得，具体获得的代码如下:     
+
+- InitIntegratedModules的方法       
+``` C#    
+     private void InitIntegratedModules() 
+     {
+        _moduleCollection = BuildIntegratedModuleCollection(_moduleConfigInfo);
+        InitModulesCommon();
+     }   
+```      
 
 ``` C#      
 
@@ -96,7 +106,8 @@
         out int           count);
 
 
-```    
+```     
+5.对于经典模式，Module的获得是调用配置文件  
 
 
 
