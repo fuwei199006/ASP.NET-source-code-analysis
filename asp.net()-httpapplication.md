@@ -87,14 +87,20 @@
 3. 对于Module的理解，需要根据应用程序池的模式来处理（经典和集成）。
 4. 对于集成模式，获得所有Modules的方法是调用非托管的方法的进行获得，具体获得的代码如下:     
 
-- InitIntegratedModules的方法       
-``` C#    
-     private void InitIntegratedModules() 
-     {
-        _moduleCollection = BuildIntegratedModuleCollection(_moduleConfigInfo);
-        InitModulesCommon();
-     }   
-```      
+    - InitIntegratedModules的方法       
+    ``` C#    
+         private void InitIntegratedModules() 
+         {
+            _moduleCollection = BuildIntegratedModuleCollection(_moduleConfigInfo);
+            InitModulesCommon();
+         }   
+    ```       
+    - _moduleConfigInfo 的来源     
+    ``` C#     
+    
+    
+   ```      
+    
 
 ``` C#      
 
