@@ -201,15 +201,21 @@
 #### 根据应用程序池的类型创建不同的_stepManager      
 
 这里很简单，直接看代码：    
-``` C#    
-// Construct the execution steps array
-if (HttpRuntime.UseIntegratedPipeline) {
-    _stepManager = new PipelineStepManager(this);
-}
-else {
-    _stepManager = new ApplicationStepManager(this);
-}
+    ``` C#    
+    // Construct the execution steps array
+    if (HttpRuntime.UseIntegratedPipeline) {
+        _stepManager = new PipelineStepManager(this);
+    }
+    else {
+        _stepManager = new ApplicationStepManager(this);
+    }
+    
+    ```
 
-```
+#### 执行BuildStep   
+   
 
-#### 执行BuildStep
+BuildStep与ResumeStep是Asp.net的核心运行环节。同样，在经典模式与集成模式下原理和过程也有所不一样。
+
+1. 下面先讨论集成模式下是如何进行的。
+
