@@ -215,7 +215,9 @@
 #### 执行BuildStep   
    
 
-BuildStep与ResumeStep是Asp.net的核心运行环节。同样，在经典模式与集成模式下原理和过程也有所不一样。
+BuildStep与ResumeStep是Asp.net的核心运行环节。同样，在经典模式与集成模式下原理和过程也有所不一样。       
+
+##### 集成模式 
 
 1. 下面先讨论集成模式下是如何进行的。   
 
@@ -268,7 +270,7 @@ internal override void BuildSteps(WaitCallback stepCallback)
 }   
 ```    
      
-2. 上面的代码是核心是AddEventMapping方法，把相关的步骤添加到一个Container.      
+2. 上面的代码是核心是AddEventMapping方法，把相关的步骤添加到一个PipelineModuleStepContainer.      
 
 ``` C#    
 private void AddEventMapping(string moduleName,RequestNotification requestNotification,bool isPostNotification, IExecutionStep step) 
@@ -285,6 +287,61 @@ private void AddEventMapping(string moduleName,RequestNotification requestNotifi
  } 
   
 
+ ```        
+ 
+ ##### 经典模式   
+ 
+ 1.看下代码：    
+ 
+ ``` C#    
+ 
+       internal override void BuildSteps(WaitCallback stepCallback ) {
+                ArrayList steps = new ArrayList();
+                HttpApplication app = _application;
+
+                bool urlMappingsEnabled = false;
+                UrlMappingsSection urlMappings = RuntimeConfig.GetConfig().UrlMappings;
+                urlMappingsEnabled = urlMappings.IsEnabled && ( urlMappings.UrlMappings.Count > 0 );
+
+                steps.Add(new ValidateRequestExecutionStep(app));
+                steps.Add(new ValidatePathExecutionStep(app));
+
+                if (urlMappingsEnabled)
+                    steps.Add(new UrlMappingsExecutionStep(app)); // url mappings
+
+                app.CreateEventExecutionSteps(HttpApplication.EventBeginRequest, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventAuthenticateRequest, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventDefaultAuthentication, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPostAuthenticateRequest, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventAuthorizeRequest, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPostAuthorizeRequest, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventResolveRequestCache, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPostResolveRequestCache, steps);
+                steps.Add(new MapHandlerExecutionStep(app));     // map handler
+                app.CreateEventExecutionSteps(HttpApplication.EventPostMapRequestHandler, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventAcquireRequestState, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPostAcquireRequestState, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPreRequestHandlerExecute, steps);
+                steps.Add(app.CreateImplicitAsyncPreloadExecutionStep()); // implict async preload step
+                steps.Add(new CallHandlerExecutionStep(app));  // execute handler
+                app.CreateEventExecutionSteps(HttpApplication.EventPostRequestHandlerExecute, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventReleaseRequestState, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPostReleaseRequestState, steps);
+                steps.Add(new CallFilterExecutionStep(app));  // filtering
+                app.CreateEventExecutionSteps(HttpApplication.EventUpdateRequestCache, steps);
+                app.CreateEventExecutionSteps(HttpApplication.EventPostUpdateRequestCache, steps);
+                _endRequestStepIndex = steps.Count;
+                app.CreateEventExecutionSteps(HttpApplication.EventEndRequest, steps);
+                steps.Add(new NoopExecutionStep()); // the last is always there
+
+                _execSteps = new IExecutionStep[steps.Count];
+                steps.CopyTo(_execSteps);
+
+                // callback for async completion when reposting to threadpool thread
+                _resumeStepsWaitCallback = stepCallback;
+            }
+ 
+ 
  ```   
 
 
