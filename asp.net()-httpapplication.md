@@ -332,7 +332,7 @@ private void AddEventMapping(string moduleName,RequestNotification requestNotifi
                 app.CreateEventExecutionSteps(HttpApplication.EventPostUpdateRequestCache, steps);
                 _endRequestStepIndex = steps.Count;
                 app.CreateEventExecutionSteps(HttpApplication.EventEndRequest, steps);
-                steps.Add(new NoopExecutionStep()); // the last is always there
+                steps.Add(new  NoopExecutionStep()); // the last is always there
 
                 _execSteps = new IExecutionStep[steps.Count];
                 steps.CopyTo(_execSteps);
@@ -342,7 +342,8 @@ private void AddEventMapping(string moduleName,RequestNotification requestNotifi
             }
  
  
- ```   
+ ```     
+对于  
 
 
 
