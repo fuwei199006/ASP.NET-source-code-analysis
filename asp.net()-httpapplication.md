@@ -217,5 +217,120 @@
 
 BuildStep与ResumeStep是Asp.net的核心运行环节。同样，在经典模式与集成模式下原理和过程也有所不一样。
 
-1. 下面先讨论集成模式下是如何进行的。
+1. 下面先讨论集成模式下是如何进行的。   
+
+``` C#   
+
+
+internal override void BuildSteps(WaitCallback stepCallback) 
+{
+    HttpApplication app = _application;
+
+    IExecutionStep materializeStep = new MaterializeHandlerExecutionStep(app);
+
+    app.AddEventMapping(
+        HttpApplication.IMPLICIT_HANDLER,
+        RequestNotification.MapRequestHandler,
+        false, materializeStep);
+
+    app.AddEventMapping(
+        HttpApplication.IMPLICIT_HANDLER,
+        RequestNotification.ExecuteRequestHandler,
+        false, app.CreateImplicitAsyncPreloadExecutionStep());
+
+    IExecutionStep handlerStep = new CallHandlerExecutionStep(app);
+
+    app.AddEventMapping(
+        HttpApplication.IMPLICIT_HANDLER,
+        RequestNotification.ExecuteRequestHandler,
+        false, handlerStep);
+
+    IExecutionStep webSocketsStep = new TransitionToWebSocketsExecutionStep(app);
+
+    app.AddEventMapping(
+        HttpApplication.IMPLICIT_HANDLER,
+        RequestNotification.EndRequest,
+        true /* isPostNotification */, webSocketsStep);
+
+
+    IExecutionStep filterStep = new CallFilterExecutionStep(app);
+    app.AddEventMapping(
+        HttpApplication.IMPLICIT_FILTER_MODULE,
+        RequestNotification.UpdateRequestCache,
+        false, filterStep);
+
+    app.AddEventMapping(
+        HttpApplication.IMPLICIT_FILTER_MODULE,
+        RequestNotification.LogRequest,
+        false, filterStep);
+
+    _resumeStepsWaitCallback = stepCallback;
+}   
+```    
+     
+2. 上面的代码是核心是AddEventMapping方法，把相关的步骤添加到一个Container.      
+
+``` C#    
+private void AddEventMapping(string moduleName,RequestNotification requestNotification,bool isPostNotification, IExecutionStep step) 
+ {
+
+    ThrowIfEventBindingDisallowed();
+    if (!IsContainerInitalizationAllowed) {
+        return;
+    }
+    PipelineModuleStepContainer container = GetModuleContainer(moduleName);
+    if (container != null) {
+        container.AddEvent(requestNotification, isPostNotification, step);
+    }
+ } 
+  
+
+ ```   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
