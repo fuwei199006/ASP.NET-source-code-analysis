@@ -39,8 +39,9 @@
         var context = (HttpApplication) sender;
         context.Response.Write("<h1>Hello MyModule</h1>");
     }
-   ```
-
+   ```     
+   运行结果：
+![](/assets/HttpModule.png)
 5. 添加web.config文件如下\(在 system.webServer下 modules节点下面\):
 
    ```xml
@@ -477,7 +478,9 @@ IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCal
             }
         }
     }
-```
+```   
+根据今天的分析，可以把上次的图更加完善下：    
+![](/assets/Asp.net2.png)
 
-
+ 
 
