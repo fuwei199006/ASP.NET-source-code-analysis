@@ -346,9 +346,30 @@ private void AddEventMapping(string moduleName,RequestNotification requestNotifi
  对于上面的代码，可以看出都调用了  CreateEventExecutionSteps 方法，这个方法的详细如下 ：    
  
  ``` C#   
+       private void CreateEventExecutionSteps(Object eventIndex, ArrayList steps) {
+            // async
+            AsyncAppEventHandler asyncHandler = AsyncEvents[eventIndex];
+            if (asyncHandler != null) {
+                asyncHandler.CreateExecutionSteps(this, steps);
+            }
+            EventHandler handler = (EventHandler)Events[eventIndex];
+
+            if (handler != null) {
+                Delegate[] handlers = handler.GetInvocationList();
+                for (int i = 0; i < handlers.Length; i++)  {
+                    steps.Add(new SyncEventExecutionStep(this, (EventHandler)handlers[i]));
+                }
+            }
+        }
+ ```        
+可以看出， CreateEventExecutionSteps是把注册的步骤都转换成了SyncEventExecutionStep，最终会被按顺序进行调用。   
+
+
+#### 执行BeginProcessRequest
  
- 
- ```   
+HttpApplication在完成BuildSteps的时候，把生成的App经过层层返回到HttpRuntime,前面几篇文章提到，在HttpRuntime里面有对app的类型进行判断，具体的代码如下：
+
+
 
 
 
