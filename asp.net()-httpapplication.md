@@ -369,7 +369,10 @@ private void AddEventMapping(string moduleName,RequestNotification requestNotifi
  
 HttpApplication在完成BuildSteps的时候，把生成的App经过层层返回到HttpRuntime,前面几篇文章提到，在HttpRuntime里面有对app的类型进行判断，具体的代码如下：
 
+```  C#    
 
+
+```   
 
 
 
