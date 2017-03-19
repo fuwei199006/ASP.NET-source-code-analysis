@@ -480,7 +480,9 @@ IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCal
     }
 ```   
 根据今天的分析，可以把上次的图更加完善下：    
-![](/assets/Asp.net2.png)
+![](/assets/Asp.net2.png)     
 
+ 
+写于2017.03.19
  
 
