@@ -134,7 +134,8 @@
  6. 最终会调用 InitModulesCommon方法,循环调用Modules中的方法    
  
  ``` C#   
-       private void InitModulesCommon() {
+       private void InitModulesCommon() 
+       {
             int n = _moduleCollection.Count;
 
             for (int i = 0; i < n; i++) {
@@ -367,12 +368,158 @@ private void AddEventMapping(string moduleName,RequestNotification requestNotifi
 
 #### 执行BeginProcessRequest
  
-HttpApplication在完成BuildSteps的时候，把生成的App经过层层返回到HttpRuntime,前面几篇文章提到，在HttpRuntime里面有对app的类型进行判断，具体的代码如下：
+HttpApplication在完成BuildSteps的时候，把生成的App经过层层返回到HttpRuntime,前面几篇文章提到，在HttpRuntime里面有对app的类型进行判断，如果是IHttpAsyncHandler直接调用BeginProcessRequest方法，具体的代码如下：
 
 ```  C#    
+    if (app is IHttpAsyncHandler) {
+      
+        IHttpAsyncHandler asyncHandler = (IHttpAsyncHandler)app;
+        context.AsyncAppHandler = asyncHandler;
+        asyncHandler.BeginProcessRequest(context, _handlerCompletionCallback, context);
+    }
+    else {
+        // synchronous handler
+        app.ProcessRequest(context);
+        FinishRequest(context.WorkerRequest, context, null);
+    }
+
+```      
+BeginProcessRequest 方法：     
+
+``` C#   
 
 
-```   
+  IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, Object extraData) {
+      HttpAsyncResult result;
+
+
+      _context = context;
+      _context.ApplicationInstance = this;
+
+      _stepManager.InitRequest();
+
+      _context.Root();
+
+      result = new HttpAsyncResult(cb, extraData);
+
+      AsyncResult = result;
+
+      if (_context.TraceIsEnabled)
+          HttpRuntime.Profile.StartRequest(_context);
+
+      ResumeSteps(null);
+      return result;
+  }
+
+
+```       
+
+其中最核心的方法是ResumeSteps方法，具体如下：  
+
+
+``` C#    
+internal override void ResumeSteps(Exception error)
+{
+   
+
+    for (; ; ) {
+
+        // ...
+
+        IExecutionStep step = _application.CurrentModuleContainer.GetNextEvent(context.CurrentNotification, context.IsPostNotification,context.CurrentModuleEventIndex);
+
+        context.SyncContext.Enable();
+
+        stepCompletedSynchronously = false;
+
+        //*******
+        error = _application.ExecuteStep(step, ref stepCompletedSynchronously);
+        //*********
+        ...
+
+        if (!stepCompletedSynchronously) {
+            _application.AcquireNotifcationContextLock(ref locked);
+            context.NotificationContext.PendingAsyncCompletion = true;
+            break;
+        }
+        else {
+            context.Response.SyncStatusIntegrated();
+        }
+    }
+          
+}
+            
+```       
+
+BeginProcessRequest 方法：     
+
+``` C#   
+
+
+  IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, Object extraData) {
+      HttpAsyncResult result;
+
+
+      _context = context;
+      _context.ApplicationInstance = this;
+
+      _stepManager.InitRequest();
+
+      _context.Root();
+
+      result = new HttpAsyncResult(cb, extraData);
+
+      AsyncResult = result;
+
+      if (_context.TraceIsEnabled)
+          HttpRuntime.Profile.StartRequest(_context);
+
+      ResumeSteps(null);
+      return result;
+  }
+
+
+```       
+
+其中最核心的方法是ResumeSteps方法，具体如下：  
+
+
+``` C#    
+    internal override void ResumeSteps(Exception error)
+    {
+   
+     ...
+    for (; ; ) {
+
+        // ...
+
+        IExecutionStep step = _application.CurrentModuleContainer.GetNextEvent(context.CurrentNotification, context.IsPostNotification,context.CurrentModuleEventIndex);
+
+        context.SyncContext.Enable();
+
+        stepCompletedSynchronously = false;
+
+        //*******
+        error = _application.ExecuteStep(step, ref stepCompletedSynchronously);
+        //*********
+        ...
+
+        if (!stepCompletedSynchronously) {
+            _application.AcquireNotifcationContextLock(ref locked);
+            context.NotificationContext.PendingAsyncCompletion = true;
+            break;
+        }
+        else {
+            context.Response.SyncStatusIntegrated();
+        }
+    }
+          
+   }
+            
+```     
+ 
+
+
 
 
 
