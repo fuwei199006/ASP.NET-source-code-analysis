@@ -77,7 +77,7 @@
 3. 对于Module的理解，需要根据应用程序池的模式来处理（经典和集成）。
 4. 对于集成模式，获得所有Modules的方法是调用非托管的方法的进行获得，具体获得的代码如下:
 
- - InitIntegratedModules的方法
+- InitIntegratedModules的方法
 	``` C#
 	private void InitIntegratedModules()
 	{
@@ -85,11 +85,13 @@
 		InitModulesCommon();
 	}
 	```
- - _moduleConfigInfo 的来源
+- _moduleConfigInfo 的来源
 这个_moduleConfigInfo的来源，还需要追到上篇 HttpApplication中三个方法的调用（EnsureAppStartCalled 第二个方法的调用）具体调用步骤如下：
-EnsureAppStartCalled --> FireApplicationOnStart --> GetSpecialApplicationInstance --> app.InitSpecial --> RegisterEventSubscriptionsWithIIS--> GetModuleCollection --> GetConfigInfoForDynamicModules-->UnsafeIISMethods.MgdGetModuleCollection 而最终的的调用来自于非托管代码
 
-	``` C#
+![](/assets/initProcess.png)
+   而最终的的调用来自于非托管代码
+
+  ``` C#
 	
 	[DllImport(_IIS_NATIVE_DLL)]
 	internal static extern int MgdGetModuleCollection(
@@ -97,8 +99,9 @@ EnsureAppStartCalled --> FireApplicationOnStart --> GetSpecialApplicationInstanc
 	IntPtr appContext,
 	out IntPtr pModuleCollection,
 	out int count);
- 
-	```
+	
+	
+      ```
 5. 对于经典模式获得Modules简单的多，直接获得是调用配置文件
 
 	``` C#
@@ -198,9 +201,55 @@ _stepManager = new ApplicationStepManager(this);
 BuildStep与ResumeStep是Asp.net的核心运行环节。同样，在经典模式与集成模式下原理和过程也有所不一样。
 
 ##### 集成模式
- 
-1. 下面先讨论集成模式下是如何进行的。     
-    
+
+1. 下面先讨论集成模式下是如何进行的。
+
+	``` C#
+	internal override void BuildSteps(WaitCallback stepCallback)
+		{
+			HttpApplication app = _application;
+			
+			IExecutionStep materializeStep = new MaterializeHandlerExecutionStep(app);
+			
+			app.AddEventMapping(
+			HttpApplication.IMPLICIT_HANDLER,
+			RequestNotification.MapRequestHandler,
+			false, materializeStep);
+			
+			app.AddEventMapping(
+			HttpApplication.IMPLICIT_HANDLER,
+			RequestNotification.ExecuteRequestHandler,
+			false, app.CreateImplicitAsyncPreloadExecutionStep());
+			
+			IExecutionStep handlerStep = new CallHandlerExecutionStep(app);
+			
+			app.AddEventMapping(
+			HttpApplication.IMPLICIT_HANDLER,
+			RequestNotification.ExecuteRequestHandler,
+			false, handlerStep);
+			
+			IExecutionStep webSocketsStep = new TransitionToWebSocketsExecutionStep(app);
+			
+			app.AddEventMapping(
+			HttpApplication.IMPLICIT_HANDLER,
+			RequestNotification.EndRequest,
+			true /* isPostNotification */, webSocketsStep);
+			
+			
+			IExecutionStep filterStep = new CallFilterExecutionStep(app);
+			app.AddEventMapping(
+			HttpApplication.IMPLICIT_FILTER_MODULE,
+			RequestNotification.UpdateRequestCache,
+			false, filterStep);
+			
+			app.AddEventMapping(
+			HttpApplication.IMPLICIT_FILTER_MODULE,
+			RequestNotification.LogRequest,
+			false, filterStep);
+			
+			_resumeStepsWaitCallback = stepCallback;
+		}
+	```
 2. 上面的代码是核心是AddEventMapping方法，把相关的步骤添加到一个PipelineModuleStepContainer.
 
 	``` C#
@@ -422,7 +471,9 @@ IAsyncResult IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCal
 			}
 		}
 	}
-```
+```      
+
+![](/assets/Asp.net2.png)
 
  
 
